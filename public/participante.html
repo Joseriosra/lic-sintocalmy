@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>LIC Sintocalmy</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head>
+<body class="ph"><div class="phone"><div class="w"></div>
+<header><img src="logo-fqp.png" alt="Farmoquímica del Pacífico"><span id="tm" class="tm" style="display:none"></span></header>
+<main id="main"></main>
+<footer><b id="isi" style="color:#bfe3da;font-weight:500"></b><br><span id="ft"></span></footer></div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const AV=['🌿','🌸','🌙','🩺','💤','🍃','⚕️','☀️'];const L=['A','B','C','D'];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const safe=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
+let token=safe('lic_token');if(!token){token=(crypto.randomUUID?crypto.randomUUID():Math.random().toString(36).slice(2)+Date.now().toString(36));safe('lic_token',token)}
+const socket=io();let S=null,joined=false,offset=0,tick=null,pickAv=0,sent=null;
+const av=(i,sz)=>`<span class="av av${i}" style="width:${sz}px;height:${sz}px;font-size:${sz*.5}px">${AV[i]}</span>`;
+socket.on('connect',()=>{socket.emit('resume',{token},r=>{if(r.ok){joined=true}else{joined=false;if(S)render()}})});
+socket.on('kicked',()=>{joined=false;safe('lic_token',crypto.randomUUID?crypto.randomUUID():String(Date.now()));location.reload()});
+socket.on('state',s=>{S=s;offset=s.serverNow-Date.now();if(!(s.type==='alternativas'&&sent!==null&&sent.n===s.n&&joined&&document.querySelector('.opt')&&false)){}render()});
+function rem(){return Math.max(0,S.endsAt-(Date.now()+offset))}
+function join(){const name=$('nm').value.trim();if(!name){$('nm').focus();return}safe('lic_name',name);
+ socket.emit('join',{token,name,avatar:pickAv},r=>{if(r.ok){joined=true}})}
+function render(){
+ clearInterval(tick);$('tm').style.display='none';
+ $('isi').textContent=S.meta.isi;$('ft').textContent=S.meta.footer;
+ const m=$('main');
+ if(!joined||!S.me){
+  m.innerHTML=`<h1>Elige tu avatar</h1><p class="sub" style="font-size:16px;margin-top:6px">y escribe tu nombre</p>
+  <div class="avgrid">${AV.map((_,i)=>`<button class="av av${i} ${i===pickAv?'sel':''}" data-i="${i}">${AV[i]}</button>`).join('')}</div>
+  <input id="nm" class="inp" maxlength="24" placeholder="Tu nombre o apodo" value="${esc(safe('lic_name')||'')}"><button class="btn" id="go">Entrar al caso</button>`;
+  m.querySelectorAll('.avgrid button').forEach(b=>b.onclick=()=>{pickAv=+b.dataset.i;m.querySelectorAll('.avgrid button').forEach(x=>x.classList.toggle('sel',x===b))});
+  $('go').onclick=join;return}
+ const me=S.me;let h='';
+ const meBar=`<div class="lrow" style="margin:0 0 14px">${av(me.avatar,34)}<span>${esc(me.name)}</span><span class="pt">${me.score} pts</span></div>`;
+ switch(S.type){
+ case 'lobby':h=`${meBar}<h1>¡Estás dentro!</h1><p class="sub" style="margin-top:10px;font-size:17px">${esc(S.titulo)}</p><p style="margin-top:18px;color:var(--grey)">Espera a que el moderador inicie el caso. Mantén esta pantalla abierta.</p><div class="bar"><i style="width:40%"></i></div>`;break;
+ case 'video':h=`${meBar}<h1>Video introductorio</h1><p class="sub" style="margin-top:10px;font-size:17px">Mira la pantalla principal.</p>${S.video.escenas.map((e,i)=>`<div class="pbox"><div style="font-weight:800;color:var(--teal)">${i+1}</div><div style="font-weight:700;margin-top:2px">${esc(e.titulo)}</div></div>`).join('')}`;break;
+ case 'caso':{const c=S.caso;h=`${meBar}<h1>Caso clínico</h1><div class="pbox"><div style="display:flex;gap:14px;align-items:center"><span class="av av0" style="width:58px;height:58px;font-size:29px">👩</span><div><div style="font-weight:700;font-size:19px">${esc(c.nombre)}</div><span class="pill" style="font-size:12px;padding:4px 12px;margin-top:4px">${esc(c.ecog)}</span></div></div><ul style="margin-top:16px">${c.datos.map(d=>`<li>${esc(d)}</li>`).join('')}</ul></div><p style="margin-top:16px;font-weight:600;color:var(--teal2)">${esc(c.etiqueta)}: ${esc(c.comite)} ${esc(c.tip)}</p>`;break}
+ case 'pregunta':h=`${meBar}<div class="lbl">Pregunta ${S.n} de ${S.totalQ}</div><h3 style="margin-top:8px">${esc(S.q.enunciado)}</h3><p style="margin-top:20px;color:var(--grey)">Las alternativas aparecerán en un momento…</p><div class="bar"><i style="width:60%"></i></div>`;break;
+ case 'alternativas':{const a=me.answer;sent=a?a.choice:sent;
+  h=`<div class="lbl">Pregunta ${S.n} de ${S.totalQ}</div><h3 style="margin:8px 0 6px">${esc(S.q.enunciado)}</h3>`+S.q.alternativas.map((t,i)=>`<button class="opt ${a&&a.choice===i?'sel':''} ${a&&a.choice!==i?'dim':''}" data-i="${i}" ${a||S.locked?'disabled':''}><span class="l">${L[i]}</span><span style="${S.q.grande?'font-size:26px;font-weight:700;line-height:34px':''}">${esc(t)}</span></button>`).join('')+(a?'<p class="center" style="margin-top:16px;font-weight:700;color:var(--teal2)">✓ Respuesta enviada</p>':S.locked?'<p class="center" style="margin-top:16px;color:var(--grey)">Tiempo agotado</p>':'');
+  m.innerHTML=h;
+  m.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{m.querySelectorAll('.opt').forEach(x=>x.disabled=true);b.classList.add('sel');socket.emit('answer',{choice:+b.dataset.i},r=>{if(!r.ok&&!r.dup){m.querySelectorAll('.opt').forEach(x=>x.disabled=false);b.classList.remove('sel')}})});
+  const t=$('tm');t.style.display='';const upd=()=>{const r=rem();const s=Math.ceil(r/1000),pd=n=>String(n).padStart(2,'0');t.textContent='00:'+pd(Math.floor(s/60))+':'+pd(s%60);t.style.background=r<10000?'var(--red)':''};upd();tick=setInterval(upd,250);return}
+ case 'respuesta':{const q=S.q,a=me.answer;
+  h=`${meBar}<div class="center" style="margin:6px 0 14px">${a?(a.correct?`<div class="big" style="color:var(--ok)">¡Correcto!</div><div style="font-weight:700;font-size:20px;margin-top:4px">+${a.points} pts</div>`:`<div class="big" style="color:var(--red)">Incorrecto</div><div style="color:var(--grey);margin-top:4px">0 pts esta vez</div>`):`<div class="big" style="color:var(--grey)">Sin respuesta</div>`}</div>`+q.alternativas.map((t,i)=>`<div class="opt ${i===q.correcta?'ok':(a&&a.choice===i?'bad':'dim')}"><span class="l">${i===q.correcta?'✓':L[i]}</span><span style="font-size:15px">${esc(t)}</span></div>`).join('')+`<div class="pbox"><div class="lbl" style="font-size:11px;color:var(--orange)">Justificación</div><p style="font-size:15px;line-height:22px;margin-top:8px">${esc(q.justificacion)}</p></div>`;break}
+ case 'ranking':case 'podio':{
+  h=`<h1>${S.type==='podio'?'Ranking final':'Tu posición'}</h1><div class="pbox" style="background:var(--navy);color:#fff;text-align:center"><div style="font-size:48px;font-weight:700">${me.rank}.º</div><div style="opacity:.9">${me.score} pts · de ${me.total} participantes</div></div>`+S.ranking.slice(0,5).map((p,i)=>`<div class="lrow"><span class="rk">${i+1}</span>${av(p.avatar,34)}<span>${esc(p.name)}</span><span class="pt">${p.score}</span></div>`).join('');break}
+ case 'cierre':h=`${meBar}<h1>${esc(S.cierre.titulo)}</h1>`+S.cierre.cifras.map(x=>`<div class="pbox"><div style="font-size:26px;font-weight:700;color:var(--teal)">${esc(x.valor)}</div><div style="color:var(--grey);margin-top:4px;font-size:15px;line-height:21px">${esc(x.texto)}</div></div>`).join('');break
+ case 'refs':h=`<h1>Referencias</h1><ol class="refs">${S.refs.map(r=>`<li>${esc(r)}</li>`).join('')}</ol><p class="center" style="margin-top:18px;font-weight:700;color:var(--teal2)">¡Gracias por participar!</p>`;break}
+ m.innerHTML=h;
+}
+</script></body></html>

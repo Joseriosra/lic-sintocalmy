@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LIC Sintocalmy · Moderador</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head>
+<body class="mod">
+<div id="stage"><div class="bgwave w1"></div><div class="bgwave w2"></div><div class="tab"></div>
+ <img class="hdr" src="logo-fqp.png" alt="Farmoquímica del Pacífico"><div class="draft" id="draft"></div>
+ <div class="main" id="main"></div>
+ <div class="foot"><b id="isi"></b><br><span id="ft"></span></div>
+ <div class="btnbar"><button class="sec" id="prev">← Atrás</button><button id="next">Siguiente →</button><button class="sec" id="reset">Reiniciar</button></div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const AV=['🌿','🌸','🌙','🩺','💤','🍃','⚕️','☀️'];
+const L=['A','B','C','D'];
+const stage=document.getElementById('stage');
+function fit(){const s=Math.min(innerWidth/1440,innerHeight/900);stage.style.transform=`translate(-50%,-50%) scale(${s})`}
+addEventListener('resize',fit);fit();
+const key=new URLSearchParams(location.search).get('key')||'';
+const socket=io();let S=null,offset=0,tick=null,counts={};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const av=(i,sz)=>`<span class="av av${i}" style="width:${sz}px;height:${sz}px;font-size:${sz*.5}px">${AV[i]}</span>`;
+socket.on('connect',()=>socket.emit('mod:auth',{key},r=>{if(!r.ok)document.body.innerHTML='<p style="padding:40px;font:20px sans-serif">Clave de moderador incorrecta. Agrega ?key=TU_CLAVE a la URL.</p>'}));
+$('next').onclick=()=>socket.emit('mod:next');$('prev').onclick=()=>socket.emit('mod:prev');
+$('reset').onclick=()=>{if(confirm('¿Reiniciar el juego y los puntajes?'))socket.emit('mod:reset')};
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')socket.emit('mod:next');if(e.key==='ArrowLeft')socket.emit('mod:prev')});
+socket.on('state',s=>{S=s;offset=s.serverNow-Date.now();counts=s.counts;render()});
+socket.on('counts',c=>{counts=c;const e=$('cnt');if(e)e.textContent=c.total;const a=$('ans');if(a)a.textContent=`Respondieron ${c.answered||0} / ${c.total}`});
+function rem(){return Math.max(0,S.endsAt-(Date.now()+offset))}
+function fmt(ms){const s=Math.ceil(ms/1000),p=n=>String(n).padStart(2,'0');return '00:'+p(Math.floor(s/60))+':'+p(s%60)}
+
+function vidHTML(v){
+ if(v.src)return `<div class="vid"><video src="${v.src}" controls playsinline></video></div>`;
+ const E=v.escenas;
+ const steps=[['1','Modulación GABAérgica','Los flavonoides potencian la señal inhibitoria del receptor GABA-A.'],['2','Menor hiperexcitación','Baja la sobreactivación neuronal asociada al estrés sostenido.'],['3','Calma y sueño fisiológico','Se traduce en menos ansiedad y una conciliación del sueño más fácil.']];
+ const card=(tag,bg,mg,l1,l2,img,alt)=>`<div class="pc" style="width:590px"><div style="flex:1"><span class="pillv" style="background:${bg};font-size:15px;padding:5px 14px">${tag}</span><div style="font-size:54px;font-weight:800;line-height:1.05;margin-top:8px">${mg}</div><div style="font-size:20px;font-weight:700;line-height:1.3;margin-top:6px">${l1}</div><div style="font-size:18px;color:var(--grey);line-height:1.3;margin-top:2px">${l2}</div></div><img src="${img}" alt="${alt}" style="width:170px"></div>`;
+ const chip=(a,b)=>`<div class="chip"><b>${a}</b><span>${b}</span></div>`;
+ return `<div class="vid"><div class="prog">${E.map(()=>'<i><b></b></i>').join('')}</div>
+ <div class="ctl"><button id="vpause">⏸ Pausa</button><button id="vreplay">↻ Repetir</button></div>
+ <div class="sc" style="background:#fafdfb"><img src="img/portada.jpg" alt="Flor de Passiflora incarnata y envases de Sintocalmy" style="position:absolute;inset:0;width:1328px;height:710px;object-fit:cover"><div style="position:absolute;left:72px;top:70px;width:640px"><div class="eb">Fitofármaco · Passiflora incarnata</div><div style="font-size:132px;font-weight:800;letter-spacing:-4px;line-height:1;color:var(--teal);margin-top:10px">sintocalmy</div><div style="font-size:46px;font-weight:800;line-height:1.12;margin-top:14px">Para que quien cuida también pueda descansar</div><div style="font-size:24px;line-height:1.4;margin-top:16px">Extracto seco estandarizado en vitexina, para la ansiedad y el insomnio</div><div style="display:flex;gap:14px;margin-top:24px"><span class="pillv" style="background:var(--blue)">300 mg · 21 mg vitexina</span><span class="pillv" style="background:var(--navy)">600 mg · 42 mg vitexina</span></div></div></div>
+ <div class="sc" style="background:#fafdfb"><div style="position:absolute;left:72px;top:44px;width:700px"><div class="eb">El producto · Principio activo</div><div style="font-size:56px;font-weight:800;line-height:1.08;margin-top:10px">Una dosis medida de vitexina en cada comprimido</div><div style="font-size:24px;line-height:1.45;margin-top:18px">Extracto seco estandarizado de partes aéreas de Passiflora incarnata. La vitexina es su flavonoide marcador de calidad.</div><div style="display:flex;gap:22px;margin-top:30px"><div class="stat2" style="background:var(--navy)"><div class="v" style="color:var(--mint)">21 mg</div><div class="x">de vitexina en Sintocalmy 300 mg</div></div><div class="stat2" style="background:var(--blue)"><div class="v">42 mg</div><div class="x">de vitexina en Sintocalmy 600 mg</div></div></div></div><div style="position:absolute;left:860px;top:44px;width:400px;height:540px;border-radius:30px;background:#e2ece9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><img src="img/caja300.png" alt="Envase de Sintocalmy 300 mg" style="width:330px"><img src="img/caja600.jpg" alt="Envase de Sintocalmy 600 mg" style="width:330px;border-radius:8px"></div></div>
+ <div class="sc dk"><div style="position:absolute;left:72px;top:44px;width:700px"><div class="eb">Mecanismo de acción</div><div style="font-size:54px;font-weight:800;line-height:1.1;margin-top:10px;color:#fff">Un freno natural para la hiperexcitación</div><div style="margin-top:34px">${steps.map(s=>`<div class="stp"><div class="n">${s[0]}</div><div><div class="t">${s[1]}</div><div class="d">${s[2]}</div></div></div>`).join('')}</div></div><img src="img/sinapsis.jpg" alt="Ilustración de una sinapsis GABAérgica" style="position:absolute;left:820px;top:60px;width:440px;height:293px;object-fit:cover;border-radius:24px"><div style="position:absolute;left:820px;top:376px;width:440px;font-size:18px;line-height:1.5;color:#bfe3da">Evidencia preclínica: en modelos experimentales la vitexina mostró efectos ansiolíticos y anticonvulsivantes, mediados por mecanismos GABAérgicos (Oliveira et al., Front Pharmacol 2020).</div></div>
+ <div class="sc" style="background:#fafdfb"><div style="position:absolute;left:60px;top:26px;right:60px"><div class="eb">Presentaciones y seguridad</div><div style="font-size:42px;font-weight:800;line-height:1.1;margin-top:6px">Dos presentaciones, un uso responsable</div></div><div style="position:absolute;left:60px;top:116px;display:flex;gap:28px">${card('DÍA','var(--blue)','300 mg','Inicio y mantención diurna','Ansiedad leve y tensión nerviosa','img/caja300.png','Envase de Sintocalmy 300 mg')}${card('NOCHE','var(--navy)','600 mg','Dosis reforzada para la toma nocturna','Dificultad para conciliar el sueño y ansiedad más marcada','img/caja600.jpg','Envase de Sintocalmy 600 mg')}</div><div style="position:absolute;left:60px;top:344px;width:1208px;display:flex;gap:18px">${chip('Reacciones descritas','Mareo y somnolencia. Casos de hipersensibilidad.')}${chip('Precaución','Depresores del SNC y fármacos que prolongan el intervalo QT.')}${chip('Contraindicaciones','Embarazo. Evitar en arritmias o alteraciones cardíacas.')}</div><div style="position:absolute;left:60px;top:458px;width:1208px;height:64px;border-radius:18px;background:var(--navy);color:#fff;display:flex;align-items:center;padding:0 28px;box-sizing:border-box;font-size:24px;font-weight:800">Pensado para el cuidador. No indicado para el manejo del delirium del paciente hospitalizado.</div></div>
+ <div class="cap" id="cap"></div></div>`;
+}
+function startVideo(v){
+ if(v.src)return;
+ const E=v.escenas,scs=[...document.querySelectorAll('.vid .sc')],bars=[...document.querySelectorAll('.vid .prog b')];
+ let idx=0,t0=0,before=0,paused=false;
+ function show(i){idx=i;scs.forEach((s,k)=>s.classList.toggle('on',k===i));$('cap').textContent=E[i].texto;bars.forEach((b,k)=>b.style.width=k<i?'100%':'0');t0=Date.now();before=0}
+ show(0);
+ tick=setInterval(()=>{if(paused)return;const e=before+(Date.now()-t0),d=E[idx].seg*1000;bars[idx].style.width=Math.min(100,e/d*100)+'%';if(e>=d&&idx<E.length-1)show(idx+1)},100);
+ $('vpause').onclick=()=>{paused=!paused;if(paused)before+=Date.now()-t0;else t0=Date.now();$('vpause').textContent=paused?'▶ Seguir':'⏸ Pausa'};
+ $('vreplay').onclick=()=>{paused=false;$('vpause').textContent='⏸ Pausa';show(0)};
+}
+
+function qhead(){return `<div class="lbl">Pregunta ${S.n} de ${S.totalQ}</div>`}
+function render(){
+ clearInterval(tick);
+ $('draft').textContent=S.meta.borrador;$('isi').textContent=S.meta.isi;$('ft').textContent=S.meta.footer;
+ let h='';const m=$('main');
+ switch(S.type){
+ case 'lobby':
+  h=`<div style="position:absolute;left:0;top:110px;width:760px"><div class="lbl">Live Interactive Case</div><h1 class="caps" style="margin-top:14px;font-size:42px;line-height:54px">${esc(S.titulo)}</h1>
+   <p class="sub" style="margin-top:28px">${esc(S.subtitulo)}</p><div style="width:160px;height:6px;border-radius:3px;background:var(--red);margin:26px 0"></div>
+   <p style="font-weight:500;font-size:16px">${esc(S.base)}</p>
+   <div style="margin-top:40px"><div class="sub" style="font-size:16px;font-weight:500">Participantes conectados</div><div style="font-size:88px;font-weight:700;color:#fff" id="cnt">${counts.total||0}</div></div></div>
+   <div class="card qrcard" id="qrc"><div id="qr" style="height:340px"></div><div style="font-size:22px;font-weight:700;margin-top:14px">Escanea para unirte</div><div id="qru" style="color:var(--grey);margin-top:6px;font-size:15px;word-break:break-all"></div></div>`;
+  m.innerHTML=h;
+  fetch('/api/qr').then(r=>r.json()).then(j=>{$('qr').innerHTML=j.svg;$('qru').textContent=j.url.replace(/^https?:\/\//,'')});return;
+ case 'video':m.innerHTML=vidHTML(S.video);startVideo(S.video);return;
+ case 'caso':{const c=S.caso;
+  h=`<div class="lbl">Caso clínico</div><h2 class="caps">Ficha de paciente</h2>
+  <div class="card" style="position:absolute;left:0;top:110px;width:640px;height:560px;padding:32px">
+   <div style="display:flex;gap:22px;align-items:center"><span class="av av0" style="width:96px;height:96px;font-size:48px">👩</span><div><div style="font-size:30px;font-weight:700">${esc(c.nombre)}</div><span class="pill" style="margin-top:10px;font-size:14px">${esc(c.ecog)}</span></div></div>
+   <ul style="margin:34px 0 0 22px;font-size:20px;font-weight:500;line-height:28px">${c.datos.map(d=>`<li style="margin-bottom:22px">${esc(d)}</li>`).join('')}</ul></div>
+  <div class="dark" style="position:absolute;left:684px;top:110px;right:0;height:250px;padding:32px"><div style="color:#c5ced8;font-size:16px;font-weight:500">${esc(c.etiqueta)}</div><div style="font-size:38px;font-weight:700;margin-top:14px;line-height:46px">${esc(c.comite)}</div><div style="color:#e4e8ed;font-size:18px;margin-top:40px">${esc(c.tip)}</div></div>
+  <div class="card" style="position:absolute;left:684px;top:390px;right:0;height:280px;padding:32px"><div style="font-size:22px;font-weight:700">Hoy vamos a responder ${S.totalQ} preguntas</div><p class="sub" style="font-size:18px;margin-top:12px">Suma puntos por acierto y por rapidez. Cada pregunta tiene ${S.segundos||50} segundos.</p><span class="pill" style="margin-top:34px;font-size:14px">${S.totalQ} preguntas · ${S.segundos||50} s cada una</span></div>`;break}
+ case 'pregunta':
+  h=`<div style="position:absolute;left:0;top:100px;width:1250px">${qhead()}<h1 style="margin-top:14px">${esc(S.q.enunciado)}</h1><div style="margin-top:36px"><span class="pill">${esc(S.q.corta)}</span></div><p class="sub" style="margin-top:34px">Prepara tu celular: las alternativas aparecen a continuación.</p></div>`;break;
+ case 'alternativas':
+  h=`${qhead()}<h2 style="font-size:28px;line-height:36px;width:1000px;margin-top:6px">${esc(S.q.enunciado)}</h2>
+  <div class="timer" id="tm">${fmt(rem())}</div><div id="ans" style="position:absolute;right:16px;top:74px;font-size:14px;color:#fff;font-weight:500">Respondieron ${counts.answered||0} / ${counts.total||0}</div>
+  <div class="alts" style="margin-top:56px">${S.q.alternativas.map((a,i)=>`<div class="alt ${S.q.grande?'big':''}"><span class="l">${L[i]}</span><span class="t">${esc(a)}</span></div>`).join('')}</div>`;
+  m.innerHTML=h;tick=setInterval(()=>{const e=$('tm');if(!e)return;const r=rem();e.textContent=fmt(r);e.classList.toggle('low',r<10000)},200);return;
+ case 'respuesta':{const q=S.q;
+  h=`<div class="lbl">✓ Respuesta correcta</div><h2 style="font-size:24px;line-height:32px;width:760px">${esc(q.enunciado)}</h2>
+  <div class="alts" style="width:780px;margin-top:20px;gap:16px">${q.alternativas.map((a,i)=>`<div class="alt ${q.grande?'big':''} ${i===q.correcta?'ok':'no'}" style="min-height:140px"><span class="l">${i===q.correcta?'✓':L[i]}</span><span class="t" style="${q.grande?'font-size:44px;line-height:52px':'font-size:20px;line-height:28px'}">${esc(a)}</span><span class="d">${q.dist[i]}</span></div>`).join('')}</div>
+  <div class="card" style="position:absolute;left:830px;right:0;top:0;height:330px;padding:32px"><div class="lbl" style="font-size:13px;color:var(--orange)">Justificación</div><p style="font-size:18px;line-height:27px;margin-top:14px">${esc(q.justificacion)}</p></div>
+  <div class="dark" style="position:absolute;left:830px;right:0;top:360px;height:300px;padding:32px"><div style="font-size:13px;font-weight:600;color:#c5ced8;letter-spacing:.04em">DATO ADICIONAL</div><p style="font-size:19px;line-height:28px;margin-top:14px;font-weight:500">${esc(q.dato)}</p></div>`;break}
+ case 'ranking':
+  h=`<div class="lbl">Ranking · Pregunta ${S.n}</div><h2 class="caps" style="font-size:40px">Así va la tabla</h2><div style="margin-top:30px">${S.ranking.map((p,i)=>`<div class="row ${i===0?'first':''}"><span class="rk">${i+1}</span>${av(p.avatar,60)}<span class="nm">${esc(p.name)}</span><span class="pt">${p.score} pts</span></div>`).join('')||'<p class="sub">Aún no hay participantes.</p>'}</div>`;break;
+ case 'podio':{const r=S.ranking,o=[1,0,2],hs=[360,440,300],cl=['#3f6e66','var(--red)','#2d5dab'];
+  h=`<div class="lbl">Ranking final</div><h2 class="caps" style="font-size:40px">Podio del caso</h2><div class="podium" style="margin-top:50px">${o.map((k,j)=>r[k]?`<div class="col" style="height:${hs[j]}px;background:${[cl[0],cl[1],cl[2]][j]}">${av(r[k].avatar,100)}<div style="font-size:64px;font-weight:700;margin-top:30px">${k+1}</div><div style="font-size:24px;font-weight:700">${esc(r[k].name)}</div><div style="font-size:20px;opacity:.9">${r[k].score} pts</div></div>`:'').join('')}</div>`;break}
+ case 'cierre':{const c=S.cierre;
+  h=`<div class="lbl">Cierre</div><h2 class="caps" style="font-size:38px;line-height:48px;width:1200px">${esc(c.titulo)}</h2>${c.cifras.map((x,i)=>`<div class="card stat" style="left:${i*448}px"><div class="v" style="color:${['var(--teal)','var(--orange)','var(--navy)'][i]}">${esc(x.valor)}</div><div class="x">${esc(x.texto)}</div></div>`).join('')}`;break}
+ case 'refs':
+  h=`<div class="lbl">Material científico</div><h2 class="caps" style="font-size:38px">Referencias</h2><ol class="refs">${S.refs.map(r=>`<li>${esc(r)}</li>`).join('')}</ol>`;break;
+ }
+ m.innerHTML=h;
+}
+</script></body></html>

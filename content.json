@@ -1,0 +1,139 @@
+{
+ "titulo": "Quien cuida también necesita descansar: ¿qué le ofrecemos a Marcela?",
+ "subtitulo": "1 caso clínico · 5 preguntas · ranking en vivo",
+ "base": "Basado en la presentación «Sintocalmy — Jornada Científica Hospital Militar»",
+ "segundos": 40,
+ "puntosBase": 1000,
+ "puntosVelocidad": 500,
+ "borrador": "Borrador · caso ficticio · sujeto a revisión médico-legal",
+ "footer": "Material exclusivo para profesionales de la salud · Reg. ISP N° [N-624, N-625: CONFIRMAR] · Código de referencia: [PENDIENTE] · Eventos adversos: [PENDIENTE: FQP]",
+ "isi": "Posología según registro sanitario e indicación médica. Reacciones descritas: mareo y somnolencia. Contraindicado en embarazo; evitar en arritmias. Precaución con depresores del SNC y fármacos que prolongan el intervalo QT.",
+ "video": {
+  "escenas": [
+   {
+    "titulo": "Quien cuida también necesita descansar",
+    "seg": 15,
+    "texto": "Quien cuida a otra persona vive en alerta permanente: con tensión, con ansiedad y con un sueño que no descansa. Hoy conoceremos Sintocalmy, para que quien cuida también pueda descansar."
+   },
+   {
+    "titulo": "Una dosis medida de vitexina",
+    "seg": 20,
+    "texto": "Sintocalmy es un extracto seco estandarizado de las partes aéreas de Passiflora incarnata. Cada comprimido aporta una cantidad definida de vitexina, su flavonoide marcador: 21 miligramos en la presentación de 300 y 42 en la de 600."
+   },
+   {
+    "titulo": "Un freno natural para la hiperexcitación",
+    "seg": 20,
+    "texto": "La vitexina potencia la señal inhibitoria del receptor GABA-A. Así baja la sobreactivación neuronal asociada al estrés sostenido, con menos ansiedad y una conciliación del sueño más fácil. Este mecanismo se apoya en evidencia preclínica."
+   },
+   {
+    "titulo": "Dos presentaciones, un uso responsable",
+    "seg": 25,
+    "texto": "Hay dos presentaciones: 300 miligramos para el día y 600 para la toma nocturna, según el registro sanitario y la indicación médica. Recuerda las precauciones: mareo y somnolencia; cuidado con depresores del sistema nervioso central y fármacos que prolongan el QT; contraindicado en embarazo. Está pensado para el cuidador, no para el manejo del delirium del paciente hospitalizado."
+   }
+  ]
+ },
+ "caso": {
+  "nombre": "Marcela, 54 años",
+  "ecog": "Cuidadora principal",
+  "datos": [
+   "Cuida a su padre, hospitalizado",
+   "Tensión constante por el cuidado y dificultad para desconectarse",
+   "Le cuesta conciliar el sueño y prefiere evitar un hipnótico de síntesis",
+   "Busca una alternativa de origen vegetal con respaldo científico",
+   "Usa además un fármaco que prolonga el intervalo QT"
+  ],
+  "etiqueta": "El equipo médico debate",
+  "comite": "¿Qué opción de origen vegetal con respaldo le ofrecemos?",
+  "tip": "Antes de decidir, responde desde tu celular."
+ },
+ "preguntas": [
+  {
+   "corta": "Qué la distingue",
+   "grande": false,
+   "enunciado": "Un colega pregunta qué distingue a Sintocalmy de un extracto herbal no estandarizado. ¿Qué respondes?",
+   "alternativas": [
+    "Aporta una dosis definida de vitexina en cada comprimido",
+    "Actúa por un mecanismo distinto al GABAérgico",
+    "Su contenido de activo varía entre lotes"
+   ],
+   "correcta": 0,
+   "justificacion": "El contenido fijo de vitexina (21 mg en el comprimido de 300 mg y 42 mg en el de 600 mg) permite un efecto consistente en cada toma, algo que los extractos no estandarizados no garantizan. Esos extractos tienen dosis variable entre lotes y un mecanismo GABAérgico poco caracterizado.",
+   "dato": "Los análisis de productos comerciales de Passiflora muestran contenidos de vitexina muy dispares; la estandarización evita esa variabilidad."
+  },
+  {
+   "corta": "Mecanismo",
+   "grande": false,
+   "enunciado": "¿Cómo se explica que Sintocalmy ayude a bajar la hiperexcitación asociada al estrés sostenido?",
+   "alternativas": [
+    "Bloquea los receptores de glutamato",
+    "Potencia la señal inhibitoria del receptor GABA-A",
+    "Regula el ritmo circadiano"
+   ],
+   "correcta": 1,
+   "justificacion": "Los flavonoides potencian la señal inhibitoria del receptor GABA-A: baja la sobreactivación neuronal asociada al estrés y se traduce en menos ansiedad y una conciliación del sueño más fácil. La acción sobre el ritmo circadiano es la de la melatonina, no la de Sintocalmy.",
+   "dato": "La evidencia de este mecanismo es preclínica: en modelos experimentales la vitexina protegió frente a convulsiones inducidas por antagonistas GABAérgicos (picrotoxina, PTZ), pero no frente a agonistas glutamatérgicos. (Ref. 1)"
+  },
+  {
+   "corta": "Presentación",
+   "grande": false,
+   "enunciado": "Hoy Marcela tiene más ansiedad y le cuesta conciliar el sueño. ¿Qué presentación encaja con lo visto?",
+   "alternativas": [
+    "300 mg, como dosis de inicio diurna",
+    "600 mg, como dosis reforzada para la toma nocturna",
+    "Duplicar el comprimido de 300 mg"
+   ],
+   "correcta": 1,
+   "justificacion": "La presentación de 600 mg se plantea como dosis reforzada para la toma nocturna, cuando cuesta conciliar el sueño o la ansiedad es más marcada, y evita que el paciente tome dos comprimidos. El de 300 mg se usa como dosis de inicio y de mantención diurna.",
+   "dato": "Ambas presentaciones mantienen el aporte estandarizado de vitexina (21 mg y 42 mg). Posología según registro sanitario e indicación médica."
+  },
+  {
+   "corta": "Seguridad",
+   "grande": false,
+   "enunciado": "Marcela además usa un fármaco que prolonga el intervalo QT. ¿Qué corresponde?",
+   "alternativas": [
+    "Nada especial: al ser de origen vegetal no interactúa con otros fármacos",
+    "Precaución por la combinación con fármacos que prolongan el intervalo QT",
+    "Suspender el fármaco de base para iniciar Sintocalmy"
+   ],
+   "correcta": 1,
+   "justificacion": "Se recomienda precaución con los depresores del SNC y con los fármacos que prolongan el intervalo QT. Que sea de origen vegetal no significa que no tenga interacciones.",
+   "dato": "Reacciones descritas: mareo y somnolencia (y casos de hipersensibilidad). Contraindicado en embarazo; evitar en arritmias o alteraciones cardíacas."
+  },
+  {
+   "corta": "A quién va dirigido",
+   "grande": false,
+   "enunciado": "Para cerrar: ¿en cuál de estos usos NO está pensado Sintocalmy?",
+   "alternativas": [
+    "Cuidador con estrés sostenido que duerme mal",
+    "Paciente que busca una opción de origen vegetal con respaldo científico",
+    "Manejo del delirium del paciente hospitalizado"
+   ],
+   "correcta": 2,
+   "justificacion": "Sintocalmy está pensado para el cuidador: con estrés sostenido, que duerme mal y busca una alternativa fitoterapéutica con respaldo científico. No está indicado para el manejo del delirium del paciente hospitalizado.",
+   "dato": "Sintocalmy no compite con la terapia farmacológica indicada: acompaña al paciente que busca una primera opción de origen vegetal."
+  }
+ ],
+ "cierre": {
+  "titulo": "Lo que nos deja el caso de Marcela",
+  "cifras": [
+   {
+    "valor": "21 mg · 42 mg",
+    "texto": "De vitexina por comprimido en Sintocalmy 300 mg y 600 mg: una dosis reproducible en cada toma."
+   },
+   {
+    "valor": "GABA-A",
+    "texto": "Los flavonoides potencian la señal inhibitoria del receptor GABA-A: menor hiperexcitación y conciliación del sueño más fácil (evidencia preclínica). (Ref. 1)"
+   },
+   {
+    "valor": "Para el cuidador",
+    "texto": "Pensado para quien cuida; no está indicado para el manejo del delirium del paciente hospitalizado."
+   }
+  ]
+ },
+ "referencias": [
+  "de Oliveira DD, da Silva CP, Iglesias BB, Beleboni RO. Vitexin possesses anticonvulsant and anxiolytic-like effects in murine animal models. Front Pharmacol. 2020;11:1181. doi:10.3389/fphar.2020.01181.",
+  "Harit MK, Mundhe N, Tamoli S, et al. Randomized, double-blind, placebo-controlled clinical study of Passiflora incarnata in participants with stress and sleep problems. Cureus. 2024;16(3):e56530. doi:10.7759/cureus.56530. (Extracto SIVI, distinto de Sintocalmy.)",
+  "Campos et al. Revisión sistemática (PRISMA) citada en la presentación, 2025. [Referencia completa por verificar.]",
+  "Sintocalmy — Jornada Científica Hospital Militar. Farmoquímica del Pacífico, 28 de octubre de 2026."
+ ]
+}
